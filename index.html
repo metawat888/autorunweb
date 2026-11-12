@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai Auto Run Web</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Google Fonts (Prompt for Thai/English support) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#245e5d', // The dark teal text color
+                        bgLight: '#eef5f4', // The light mint background color
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom class for the dotted underline inputs to match the mockup */
+        .input-dotted {
+            border-bottom: 2px dotted #245e5d;
+            background: transparent;
+            outline: none;
+            transition: border-bottom-color 0.3s;
+        }
+        .input-dotted:focus {
+            border-bottom: 2px solid #245e5d;
+        }
+        
+        /* Custom scrollbar for textarea */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.2); 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: rgba(36, 94, 93, 0.3); 
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: rgba(36, 94, 93, 0.5); 
+        }
+    </style>
+</head>
+<body class="bg-bgLight text-primary min-h-screen p-6 md:p-12 flex flex-col font-sans selection:bg-primary selection:text-white">
+
+    <!-- Top Right Header -->
+    <header class="flex justify-center md:justify-end mb-10 md:mb-12">
+        <h1 class="font-bold tracking-[0.25em] text-lg uppercase opacity-90 hover:opacity-100 transition-opacity cursor-default">Ai Auto Run Web</h1>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 w-full max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-10 xl:gap-16">
+
+        <!-- Left Section: Target Setup & Browser Preview -->
+        <section class="xl:col-span-8 flex flex-col gap-8">
+
+            <!-- Website & Login Inputs -->
+            <div class="flex flex-col sm:flex-row items-end gap-6 sm:gap-10 font-bold tracking-wider text-sm md:text-base px-2">
+                <div class="flex items-baseline w-full sm:w-1/2 gap-4">
+                    <label for="website" class="whitespace-nowrap">Website:</label>
+                    <input type="text" id="website" class="input-dotted w-full pb-1 text-primary placeholder:text-primary/30" placeholder="e.g. wikipedia.org (กด Enter เพื่อเข้าเว็บ)">
+                </div>
+                <div class="flex items-baseline w-full sm:w-1/2 gap-4">
+                    <label for="login" class="whitespace-nowrap">Login:</label>
+                    <input type="text" id="login" class="input-dotted w-full pb-1 text-primary placeholder:text-primary/30" placeholder="username/auth">
+                </div>
+            </div>
+
+            <!-- Browser Mockup Window -->
+            <div class="rounded-xl overflow-hidden shadow-2xl shadow-primary/10 bg-[#2d2d2d] flex flex-col w-full aspect-[4/3] sm:aspect-video border border-gray-700/50 group">
+                <!-- Mac-style Title Bar -->
+                <div class="h-12 bg-[#3a3a3a] flex items-center px-4 gap-4 relative z-10 border-b border-gray-900/50">
+                    <!-- Window Controls -->
+                    <div class="flex gap-2 mt-1">
+                        <div class="w-3.5 h-3.5 rounded-full bg-[#ff5f56] shadow-inner cursor-pointer hover:bg-[#ff4036]"></div>
+                        <div class="w-3.5 h-3.5 rounded-full bg-[#ffbd2e] shadow-inner cursor-pointer hover:bg-[#ffa01f]"></div>
+                        <div class="w-3.5 h-3.5 rounded-full bg-[#27c93f] shadow-inner cursor-pointer hover:bg-[#1db333]"></div>
+                    </div>
+                    
+                    <!-- Search/URL Bar -->
+                    <div class="flex-1 max-w-xl mx-auto bg-[#252525] h-7 rounded-md flex items-center px-4 justify-center text-xs text-gray-300 font-sans shadow-inner border border-gray-700/30">
+                        <div class="flex items-center gap-2 opacity-60">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                            <span id="url-display">target-website.preview</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Actions Placeholder -->
+                    <div class="w-16 flex justify-end gap-3 text-gray-400">
+                        <svg class="w-4 h-4 cursor-pointer hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </div>
+                </div>
+                
+                <!-- Browser Viewport Area -->
+                <div class="flex-1 bg-white relative overflow-hidden flex items-center justify-center">
+                    <!-- Loading Spinner (Visible before image loads or as background) -->
+                    <div id="loading-state" class="absolute inset-0 flex flex-col items-center justify-center text-primary/40 bg-gray-50 z-0 hidden">
+                         <svg class="animate-spin -ml-1 mr-3 h-8 w-8 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-sm font-medium tracking-wide">Loading Target...</span>
+                    </div>
+
+                    <!-- Referenced Image as Browser Content (Placeholder) -->
+                    <img 
+                        id="placeholder-img"
+                        src="image_0e7158.jpg" 
+                        alt="Preview of target website" 
+                        class="w-full h-full object-cover object-top relative z-10 transition-transform duration-700 group-hover:scale-[1.02]"
+                        onerror="this.style.opacity='0';"
+                    >
+                    
+                    <!-- Functional Iframe for Web Target -->
+                    <iframe 
+                        id="browser-frame"
+                        class="w-full h-full absolute inset-0 z-20 hidden bg-white border-0"
+                        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                    ></iframe>
+                    
+                    <!-- Overlay shadow for depth -->
+                    <div class="absolute inset-0 shadow-[inset_0_10px_20px_rgba(0,0,0,0.05)] pointer-events-none z-30"></div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Section: AI Prompts & Execution -->
+        <section class="xl:col-span-4 flex flex-col gap-5 pt-2 xl:pt-10">
+            
+            <!-- Instructions Header -->
+            <div class="px-2">
+                <h2 class="font-bold text-[1.1rem] tracking-wide mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    สิ่งที่ต้องการให้ Ai Auto Run
+                </h2>
+                <p class="text-[0.9rem] opacity-85 leading-relaxed font-medium pl-1">
+                    ผู้ใช้กรอก เช่น<br>
+                    เข้าปุ่ม ค้นหา หา Ailsed ทุกๆ 1 ชม
+                </p>
+            </div>
+
+            <!-- AI Prompt Textarea -->
+            <div class="relative flex-1 min-h-[220px] xl:min-h-[300px] flex flex-col">
+                <textarea 
+                    id="ai-instruction"
+                    class="w-full flex-1 h-full bg-white/40 backdrop-blur-md border-2 border-primary/20 rounded-2xl p-5 text-primary text-base focus:outline-none focus:border-primary/60 focus:bg-white/70 transition-all resize-none shadow-sm placeholder:text-primary/40 focus:ring-4 focus:ring-primary/5" 
+                    placeholder="พิมพ์เงื่อนไขหรือคำสั่งการทำงานอัตโนมัติของคุณที่นี่..."></textarea>
+                
+                <!-- Status indicator dot -->
+                <div class="absolute top-4 right-4 flex items-center gap-2">
+                    <span class="flex h-2.5 w-2.5 relative">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+                    </span>
+                    <span class="text-xs font-bold uppercase tracking-wider opacity-60">Ready</span>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <button 
+                onclick="startAutomation()"
+                id="run-btn"
+                class="mt-4 xl:mt-auto bg-primary text-bgLight font-bold text-lg py-4 px-6 rounded-2xl shadow-[0_8px_20px_rgba(36,94,93,0.3)] hover:bg-[#1c4b4a] hover:shadow-[0_8px_25px_rgba(36,94,93,0.4)] hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] active:translate-y-0 flex items-center justify-center gap-3 overflow-hidden relative group">
+                
+                <!-- Shine effect -->
+                <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite]"></div>
+
+                <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="relative z-10">Start Auto Run</span>
+            </button>
+
+        </section>
+
+    </main>
+
+    <script>
+        // Basic interaction script
+        const websiteInput = document.getElementById('website');
+        const urlDisplay = document.getElementById('url-display');
+        const browserFrame = document.getElementById('browser-frame');
+        const placeholderImg = document.getElementById('placeholder-img');
+        const loadingState = document.getElementById('loading-state');
+
+        // Notification function
+        function showNotification(title, message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-6 right-6 bg-[#2d2d2d] text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 animate-[slideIn_0.3s_ease-out] z-50';
+            notification.innerHTML = `
+                <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm">${title}</h4>
+                    <p class="text-xs text-gray-400">${message}</p>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'translate-y-2', 'transition-all', 'duration-300');
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Load iframe when pressing Enter
+        websiteInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                let val = e.target.value.trim();
+                if (val) {
+                    if (!val.startsWith('http://') && !val.startsWith('https://')) {
+                        val = 'https://' + val;
+                    }
+                    urlDisplay.textContent = val;
+                    
+                    // Show Loading
+                    browserFrame.classList.add('hidden');
+                    if (placeholderImg) placeholderImg.classList.add('hidden');
+                    if (loadingState) loadingState.classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        if (loadingState) loadingState.classList.add('hidden');
+                        
+                        // ระบบความปลอดภัยของเบราว์เซอร์ไม่ยอมให้เปิดเว็บใหญ่ๆ ใน iframe (X-Frame-Options)
+                        // หากเป็นเว็บยอดฮิต ให้โชว์ภาพจำลองแทนเพื่อไม่ให้จอขาว
+                        const secureSites = ['line.me', 'google.', 'facebook.', 'youtube.', 'apple.'];
+                        const isSecure = secureSites.some(site => val.toLowerCase().includes(site));
+                        
+                        if (isSecure) {
+                            if (placeholderImg) {
+                                placeholderImg.src = 'image_0e7158.jpg';
+                                placeholderImg.classList.remove('hidden');
+                            }
+                            showNotification('Demo Mode', 'เว็บนี้มีการบล็อก iframe ระบบจึงแสดงภาพจำลองแทนครับ');
+                        } else {
+                            // เว็บทั่วไป ลองเปิดโดยตรง
+                            browserFrame.src = val;
+                            browserFrame.classList.remove('hidden');
+                        }
+                    }, 800);
+                    
+                } else {
+                    urlDisplay.textContent = 'target-website.preview';
+                    browserFrame.classList.add('hidden');
+                    browserFrame.src = '';
+                    if (placeholderImg) placeholderImg.classList.remove('hidden');
+                    if (loadingState) loadingState.classList.add('hidden');
+                }
+            }
+        });
+
+        // Update fake URL bar when typing website
+        websiteInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            urlDisplay.textContent = val ? val : 'target-website.preview';
+        });
+
+        // Mock button action
+        function startAutomation() {
+            const btn = document.getElementById('run-btn');
+            const originalText = btn.innerHTML;
+            const instruction = document.getElementById('ai-instruction').value;
+            
+            if(!instruction) {
+                // Visual shake effect if empty
+                const textarea = document.getElementById('ai-instruction');
+                textarea.classList.add('animate-[pulse_0.2s_3]');
+                setTimeout(() => textarea.classList.remove('animate-[pulse_0.2s_3]'), 600);
+                return;
+            }
+
+            // Change button state
+            btn.innerHTML = `<svg class="animate-spin h-6 w-6 relative z-10" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> <span class="relative z-10">Initializing AI...</span>`;
+            btn.classList.add('opacity-80', 'cursor-not-allowed');
+            
+            // Reset after simulated delay
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-80', 'cursor-not-allowed');
+                
+                // Show a nice custom notification instead of alert()
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-6 right-6 bg-[#2d2d2d] text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 animate-[slideIn_0.3s_ease-out] z-50';
+                notification.innerHTML = `
+                    <div class="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center text-green-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">Automation Started</h4>
+                        <p class="text-xs text-gray-400">AI is now executing your instructions.</p>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.add('opacity-0', 'translate-y-2', 'transition-all', 'duration-300');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+                
+            }, 1500);
+        }
+
+        // Custom animation definitions for Tailwind
+        tailwind.config.theme.extend.keyframes = {
+            shimmer: {
+                '100%': { transform: 'translateX(100%)' }
+            },
+            slideIn: {
+                '0%': { transform: 'translateY(100%)', opacity: 0 },
+                '100%': { transform: 'translateY(0)', opacity: 1 }
+            }
+        }
+    </script>
+</body>
+</html>
